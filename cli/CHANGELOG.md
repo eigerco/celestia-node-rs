@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1](https://github.com/eigerco/lumina/compare/lumina-cli-v0.2.0...lumina-cli-v0.2.1) - 2024-05-14
+
+### Other
+- update Cargo.lock dependencies
+
 ## [0.2.0](https://github.com/eigerco/lumina/compare/lumina-cli-v0.1.0...lumina-cli-v0.2.0) - 2024-04-18
 
 ### Added
