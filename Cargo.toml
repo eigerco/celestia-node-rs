@@ -4,11 +4,11 @@ members = ["cli", "node", "node-wasm", "proto", "rpc", "types"]
 
 [workspace.dependencies]
 blockstore = "0.5"
-lumina-node = { version = "0.2.0", path = "node" }
-lumina-node-wasm = { version = "0.1.1", path = "node-wasm" }
+lumina-node = { version = "0.3.0", path = "node" }
+lumina-node-wasm = { version = "0.2.0", path = "node-wasm" }
 celestia-proto = { version = "0.2.0", path = "proto" }
-celestia-rpc = { version = "0.2.0", path = "rpc", default-features = false }
-celestia-types = { version = "0.2.0", path = "types", default-features = false }
+celestia-rpc = { version = "0.2.1", path = "rpc", default-features = false }
+celestia-types = { version = "0.3.0", path = "types", default-features = false }
 libp2p = "0.53.2"
 nmt-rs = "0.1.0"
 celestia-tendermint = { version = "0.32.1", default-features = false }
