@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0](https://github.com/eigerco/lumina/compare/lumina-node-v0.2.0...lumina-node-v0.3.0) - 2024-05-23
+
+### Added
+- *(node)* Generate events for data sampling that can be used by front-end ([#276](https://github.com/eigerco/lumina/pull/276))
+- *(node/daser)* [**breaking**] Implement backward sampling and sampling window ([#269](https://github.com/eigerco/lumina/pull/269))
+
+### Fixed
+- new lints coming with 1.78 and 1.80-nightly ([#275](https://github.com/eigerco/lumina/pull/275))
+
+### Other
+- *(node)* Replace `instant` crate with `web-time` ([#280](https://github.com/eigerco/lumina/pull/280))
+
 ## [0.2.0](https://github.com/eigerco/lumina/compare/lumina-node-v0.1.1...lumina-node-v0.2.0) - 2024-04-18
 
 ### Added

@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1](https://github.com/eigerco/lumina/compare/celestia-rpc-v0.2.0...celestia-rpc-v0.2.1) - 2024-05-23
+
+### Added
+- feat!(types): Add Blob::index field introduced in celestia 0.13 ([#274](https://github.com/eigerco/lumina/pull/274))
+
+### Fixed
+- new lints coming with 1.78 and 1.80-nightly ([#275](https://github.com/eigerco/lumina/pull/275))
+
 ## [0.2.0](https://github.com/eigerco/lumina/compare/celestia-rpc-v0.1.1...celestia-rpc-v0.2.0) - 2024-04-18
 
 ### Added
