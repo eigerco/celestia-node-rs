@@ -1,0 +1,6 @@
+/.env
+/.dockerignore
+/.git*
+/ci
+/Dockerfile
+/target
