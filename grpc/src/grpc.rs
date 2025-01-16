@@ -42,6 +42,11 @@ pub use crate::grpc::auth::Account;
 pub use crate::grpc::celestia_tx::{TxStatus, TxStatusResponse};
 pub use crate::grpc::cosmos_tx::{BroadcastMode, GetTxResponse};
 
+#[cfg(all(target_arch = "wasm32", feature = "wasm-bindgen"))]
+pub use crate::grpc::auth::{JsAuthParams, JsBaseAccount, JsPublicKey};
+#[cfg(all(target_arch = "wasm32", feature = "wasm-bindgen"))]
+pub use crate::grpc::bank::JsCoin;
+
 /// Error convertible to std, used by grpc transports
 pub type StdError = Box<dyn std::error::Error + Send + Sync + 'static>;
 

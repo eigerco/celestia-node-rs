@@ -27,6 +27,17 @@ impl TestAccount {
             signing_key,
         }
     }
+
+    pub fn from_pk(pk: &[u8]) -> Self {
+        let signing_key = SigningKey::from_slice(pk).unwrap();
+        let verifying_key = *signing_key.verifying_key();
+
+        Self {
+            address: AccAddress::new(verifying_key.into()).into(),
+            verifying_key,
+            signing_key,
+        }
+    }
 }
 
 pub fn load_account() -> TestAccount {

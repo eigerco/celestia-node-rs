@@ -45,6 +45,8 @@ static CUSTOM_TYPE_ATTRIBUTES: &[(&str, &str)] = &[
     (".cosmos.staking.v1beta1.QueryUnbondingDelegationResponse", SERIALIZED_DEFAULT),
     (".cosmos.staking.v1beta1.UnbondingDelegation", SERIALIZED_DEFAULT),
     (".cosmos.staking.v1beta1.UnbondingDelegationEntry", SERIALIZED_DEFAULT),
+    (".cosmos.tx.v1beta1.SignDoc", SERIALIZED_DEFAULT),
+    (".cosmos.tx.v1beta1.SignDoc", r#"#[serde(rename_all = "camelCase")]"#),
     (".header.pb.ExtendedHeader", SERIALIZED_DEFAULT),
     (".proof.pb.Proof", SERIALIZED_DEFAULT),
     (".proto.blob.v1.BlobProto", SERIALIZED),

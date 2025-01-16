@@ -366,6 +366,12 @@ impl Blob {
     ) -> Result<Blob> {
         Self::new(*namespace, data, (*app_version).into())
     }
+
+    /// Clone a blob creating a new deep copy of it.
+    #[wasm_bindgen(js_name = clone)]
+    pub fn js_clone(&self) -> Blob {
+        self.clone()
+    }
 }
 
 fn shares_needed_for_blob(blob_len: usize) -> usize {

@@ -24,6 +24,7 @@ crate-type = ["cdylib", "rlib"]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 blockstore.workspace = true
+celestia-grpc = { workspace = true, features = ["wasm-bindgen"] }
 celestia-types = { workspace = true, features = ["wasm-bindgen"] }
 libp2p = { workspace = true, features = ["serde"] }
 lumina-node = { workspace = true, features = ["wasm-bindgen"] }
