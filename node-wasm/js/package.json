@@ -5,7 +5,7 @@
         "Eiger <hello@eiger.co>"
     ],
     "description": "Lumina node for Celestia, running in browser",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "license": "Apache-2.0",
     "repository": {
         "type": "git",
@@ -19,7 +19,7 @@
     "main": "index.js",
     "homepage": "https://www.eiger.co",
     "dependencies": {
-        "lumina-node-wasm": "0.7.0"
+        "lumina-node-wasm": "0.8.0"
     },
     "keywords": [
         "blockchain",

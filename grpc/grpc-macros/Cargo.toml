@@ -1,6 +1,6 @@
 [package]
 name = "celestia-grpc-macros"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
 description = "Helper crate for grpc_method macro for creating gRPC client, used by celestia-grpc"

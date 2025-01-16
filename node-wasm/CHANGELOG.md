@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0](https://github.com/eigerco/lumina/compare/lumina-node-wasm-v0.7.0...lumina-node-wasm-v0.8.0) - 2025-01-16
+
+### Added
+
+- *(node-wasm, types)* [**breaking**] Add method to get blobs for wasm (#468)
+- Add remaining node types for wasm (#476)
+- *(node-wasm)* Add more configuration options in `NodeConfig` (#487)
+- *(node)* [**breaking**] Implement `NodeBuilder` and remove `NodeConfig` (#472)
+
+### Other
+
+- *(ci)* migrate toolchain action, parallelize (#503)
+- *(node-wasm)* Update js build dependencies, commit package lock (#478)
+- *(node,node-wasm)* [**breaking**] Rename `syncing_window` to `sampling_window` (#477)
+
 ## [0.7.0](https://github.com/eigerco/lumina/compare/lumina-node-wasm-v0.6.1...lumina-node-wasm-v0.7.0) - 2024-12-02
 
 ### Added

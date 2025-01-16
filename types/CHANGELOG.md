@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0](https://github.com/eigerco/lumina/compare/celestia-types-v0.9.0...celestia-types-v0.10.0) - 2025-01-16
+
+### Added
+
+- *(grpc)* [**breaking**] add wasm support and transaction client (#474)
+- *(types)* add serde feature for nmt-rs (#480)
+- *(node-wasm, types)* [**breaking**] Add method to get blobs for wasm (#468)
+- Add remaining node types for wasm (#476)
+- *(types,rpc)* [**breaking**] move TxConfig to celestia-rpc (#485)
+
+### Fixed
+
+- *(types)* RowNamespaceData binary deserialization (#493)
+
+### Other
+
+- Update wasm-bindgen, remove cfg_attr wasm-bindgen workaround (#507)
+- *(ci)* migrate toolchain action, parallelize (#503)
+
 ## [0.9.0](https://github.com/eigerco/lumina/compare/celestia-types-v0.8.0...celestia-types-v0.9.0) - 2024-12-02
 
 ### Added

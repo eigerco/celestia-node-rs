@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0](https://github.com/eigerco/lumina/compare/lumina-cli-v0.5.2...lumina-cli-v0.6.0) - 2025-01-16
+
+### Added
+
+- Add remaining node types for wasm (#476)
+- *(cli)* Add `in-memory-store` and `pruning-delay` parameters (#490)
+- *(node)* [**breaking**] Implement `NodeBuilder` and remove `NodeConfig` (#472)
+
+### Fixed
+
+- *(cli)* align with dah javascript breaking changes (#501)
+
+### Other
+
+- *(ci)* migrate toolchain action, parallelize (#503)
+- *(node,node-wasm)* [**breaking**] Rename `syncing_window` to `sampling_window` (#477)
+
 ## [0.5.2](https://github.com/eigerco/lumina/compare/lumina-cli-v0.5.1...lumina-cli-v0.5.2) - 2024-12-02
 
 ### Added
