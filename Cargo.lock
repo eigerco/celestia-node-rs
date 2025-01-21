@@ -853,6 +853,7 @@ dependencies = [
  "gloo-timers 0.3.0",
  "hex",
  "http-body 1.0.1",
+ "js-sys",
  "k256",
  "prost",
  "rand_core",
@@ -864,6 +865,7 @@ dependencies = [
  "tokio",
  "tonic",
  "tonic-web-wasm-client",
+ "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
 ]
@@ -3589,6 +3591,7 @@ version = "0.7.0"
 dependencies = [
  "anyhow",
  "blockstore",
+ "celestia-grpc",
  "celestia-rpc",
  "celestia-types",
  "console_error_panic_hook",

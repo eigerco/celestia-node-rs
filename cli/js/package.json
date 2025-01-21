@@ -11,7 +11,13 @@
   "license": "MIT",
   "dependencies": {
     "lumina-node": "file:../../node-wasm/js",
-    "lumina-node-wasm": "file:../../node-wasm/pkg"
+    "lumina-node-wasm": "file:../../node-wasm/pkg",
+    "@cosmjs/proto-signing": "^0.32.4",
+    "@noble/curves": "^1.7.0"
+  },
+  "dependenciesComments": {
+    "@cosmjs/proto-signing": "only needed for grpc submitMessage",
+    "@noble/curves": "only needed for creating grpc client from private key"
   },
   "devDependencies": {
     "webpack": "^5.38.1",

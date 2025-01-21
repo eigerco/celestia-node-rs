@@ -82,3 +82,44 @@ impl FromGrpcResponse<Vec<Coin>> for QueryTotalSupplyResponse {
             .collect::<Result<_, _>>()?)
     }
 }
+
+#[cfg(all(target_arch = "wasm32", feature = "wasm-bindgen"))]
+pub use wbg::*;
+
+#[cfg(all(target_arch = "wasm32", feature = "wasm-bindgen"))]
+mod wbg {
+    use celestia_types::state::Coin;
+    use js_sys::BigInt;
+    use wasm_bindgen::{prelude::*, JsCast};
+
+    use crate::utils::make_object;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const _: &str = "
+    /**
+     * Coin
+     */
+    export interface Coin {
+      denom: string,
+      amount: bigint
+    }
+    ";
+
+    #[wasm_bindgen]
+    extern "C" {
+        /// Coin exposed to javascript
+        #[wasm_bindgen(typescript_type = "Coin")]
+        pub type JsCoin;
+    }
+
+    impl From<Coin> for JsCoin {
+        fn from(value: Coin) -> JsCoin {
+            let obj = make_object!(
+                "denom" => value.denom.into(),
+                "amount" => BigInt::from(value.amount)
+            );
+
+            obj.unchecked_into()
+        }
+    }
+}

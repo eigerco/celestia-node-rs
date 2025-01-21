@@ -18,6 +18,9 @@ categories = [
   "cryptography::cryptocurrencies",
 ]
 
+[lib]
+crate-type = ["cdylib", "lib"]
+
 [dependencies]
 celestia-grpc-macros = { version = "0.1.0", path = "grpc-macros" }
 celestia-proto = { workspace = true, features = ["tonic"] }
@@ -48,6 +51,10 @@ gloo-timers = { version = "0.3.0", features = ["futures"] }
 send_wrapper = { version = "0.6.0", features = ["futures"] }
 tonic-web-wasm-client = "0.6"
 
+js-sys = { version = "0.3.70", optional = true }
+wasm-bindgen = { version = "0.2.93", optional = true }
+wasm-bindgen-futures = { version = "0.4.43", optional = true }
+
 [dev-dependencies]
 rand_core = "0.6.4"
 
@@ -57,3 +64,7 @@ tokio = { version = "1.38.0", features = ["rt", "macros"] }
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-futures = "0.4.43"
 wasm-bindgen-test.workspace = true
+
+[features]
+default = []
+wasm-bindgen = ["celestia-types/wasm-bindgen", "dep:js-sys", "dep:wasm-bindgen", "dep:wasm-bindgen-futures"]

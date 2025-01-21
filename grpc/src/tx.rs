@@ -1,4 +1,5 @@
 use std::fmt;
+use std::future::Future;
 use std::ops::Deref;
 use std::sync::RwLock;
 use std::time::Duration;
@@ -15,7 +16,7 @@ use celestia_types::state::{
 };
 use celestia_types::{AppVersion, Height};
 use http_body::Body;
-use k256::ecdsa::signature::Signer;
+use k256::ecdsa::signature::{Error as SignatureError, Signer};
 use k256::ecdsa::{Signature, VerifyingKey};
 use prost::{Message, Name};
 use tendermint::chain::Id;
@@ -53,38 +54,6 @@ const DEFAULT_GAS_MULTIPLIER: f64 = 1.1;
 // source https://github.com/celestiaorg/celestia-core/blob/v1.43.0-tm-v0.34.35/pkg/consts/consts.go#L19
 const BLOB_TX_TYPE_ID: &str = "BLOB";
 
-/// A result of correctly submitted transaction.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TxInfo {
-    /// Hash of the transaction.
-    pub hash: Hash,
-    /// Height at which transaction was submitted.
-    pub height: Height,
-}
-
-/// Configuration for the transaction.
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
-pub struct TxConfig {
-    /// Custom gas limit for the transaction.
-    pub gas_limit: Option<u64>,
-    /// Custom gas price for fee calculation.
-    pub gas_price: Option<f64>,
-}
-
-impl TxConfig {
-    /// Attach gas limit to this config.
-    pub fn with_gas_limit(mut self, gas_limit: u64) -> Self {
-        self.gas_limit = Some(gas_limit);
-        self
-    }
-
-    /// Attach gas price to this config.
-    pub fn with_gas_price(mut self, gas_price: f64) -> Self {
-        self.gas_price = Some(gas_price);
-        self
-    }
-}
-
 /// A client for submitting messages and transactions to celestia.
 ///
 /// Client handles management of the accounts sequence (nonce), thus
@@ -111,7 +80,7 @@ where
     T::Error: Into<StdError>,
     T::ResponseBody: Body<Data = Bytes> + Send + 'static,
     <T::ResponseBody as Body>::Error: Into<StdError> + Send,
-    S: Signer<Signature>,
+    S: DocSigner,
 {
     /// Create a new transaction client.
     pub async fn new(
@@ -184,10 +153,10 @@ where
     /// ```
     pub async fn submit_message<M>(&self, message: M, cfg: TxConfig) -> Result<TxInfo>
     where
-        M: Name,
+        M: IntoAny,
     {
         let tx_body = RawTxBody {
-            messages: vec![into_any(message)],
+            messages: vec![message.into_any()],
             ..RawTxBody::default()
         };
 
@@ -265,7 +234,7 @@ where
     }
 
     /// Get most recent minimal gas price seen by the client
-    pub fn last_gas_price(&self) -> f64 {
+    pub fn last_seen_gas_price(&self) -> f64 {
         *self.gas_price.read().expect("lock poisoned")
     }
 
@@ -305,7 +274,7 @@ where
         } else {
             // simulate the gas that would be used by transaction
             // fee should be at least 1 as it affects calculation
-            let tx = sign_tx(tx.clone(), 0, 1);
+            let tx = sign_tx(tx.clone(), 0, 1).await?;
             let gas_info = self.client.simulate(tx.encode_to_vec()).await?;
             (gas_info.gas_used as f64 * DEFAULT_GAS_MULTIPLIER) as u64
         };
@@ -316,7 +285,7 @@ where
             self.update_gas_price().await?
         };
         let fee = (gas_limit as f64 * gas_price).ceil();
-        let tx = sign_tx(tx, gas_limit, fee as u64);
+        let tx = sign_tx(tx, gas_limit, fee as u64).await?;
 
         self.broadcast_tx_with_account(tx.encode_to_vec(), account)
             .await
@@ -333,7 +302,7 @@ where
 
         let pfb = MsgPayForBlobs::new(&blobs, account.address.clone())?;
         let pfb = RawTxBody {
-            messages: vec![into_any(RawMsgPayForBlobs::from(pfb))],
+            messages: vec![RawMsgPayForBlobs::from(pfb).into_any()],
             ..RawTxBody::default()
         };
 
@@ -354,7 +323,8 @@ where
             &self.signer,
             gas_limit,
             fee,
-        );
+        )
+        .await?;
 
         let blobs = blobs.into_iter().map(Into::into).collect();
         let blob_tx = RawBlobTx {
@@ -433,7 +403,7 @@ where
 #[cfg(not(target_arch = "wasm32"))]
 impl<S> TxClient<tonic::transport::Channel, S>
 where
-    S: Signer<Signature>,
+    S: DocSigner,
 {
     /// Create a new client connected to the given `url` with default
     /// settings of [`tonic::transport::Channel`].
@@ -453,7 +423,7 @@ where
 #[cfg(target_arch = "wasm32")]
 impl<S> TxClient<tonic_web_wasm_client::Client, S>
 where
-    S: Signer<Signature>,
+    S: DocSigner,
 {
     /// Create a new client connected to the given `url` with default
     /// settings of [`tonic_web_wasm_client::Client`].
@@ -482,16 +452,147 @@ impl<T, S> fmt::Debug for TxClient<T, S> {
     }
 }
 
+/// Signer capable of producing ecdsa signature using secp256k1 curve.
+pub trait DocSigner {
+    fn try_sign(&self, doc: SignDoc) -> impl Future<Output = Result<Signature, SignatureError>>;
+}
+
+impl<T> DocSigner for T
+where
+    T: Signer<Signature>,
+{
+    async fn try_sign(&self, doc: SignDoc) -> Result<Signature, SignatureError> {
+        let bytes = doc.encode_to_vec();
+        self.try_sign(&bytes)
+    }
+}
+
+/// Value convertion into protobuf's Any
+pub trait IntoAny {
+    fn into_any(self) -> Any;
+}
+
+impl<T> IntoAny for T
+where
+    T: Name,
+{
+    fn into_any(self) -> Any {
+        Any {
+            type_url: T::type_url(),
+            value: self.encode_to_vec(),
+        }
+    }
+}
+
+/// A result of correctly submitted transaction.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TxInfo {
+    /// Hash of the transaction.
+    pub hash: Hash,
+    /// Height at which transaction was submitted.
+    pub height: Height,
+}
+
+/// Configuration for the transaction.
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct TxConfig {
+    /// Custom gas limit for the transaction (in `utia`).
+    pub gas_limit: Option<u64>,
+    /// Custom gas price for fee calculation.
+    pub gas_price: Option<f64>,
+}
+
+impl TxConfig {
+    /// Attach gas limit to this config.
+    pub fn with_gas_limit(mut self, gas_limit: u64) -> Self {
+        self.gas_limit = Some(gas_limit);
+        self
+    }
+
+    /// Attach gas price to this config.
+    pub fn with_gas_price(mut self, gas_price: f64) -> Self {
+        self.gas_price = Some(gas_price);
+        self
+    }
+}
+
+#[cfg(all(target_arch = "wasm32", feature = "wasm-bindgen"))]
+pub use wbg::*;
+
+#[cfg(all(target_arch = "wasm32", feature = "wasm-bindgen"))]
+mod wbg {
+    use wasm_bindgen::{prelude::*, JsCast};
+
+    use super::{TxConfig, TxInfo};
+    use crate::utils::make_object;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const _: &str = "
+    /**
+     * Transaction info
+     */
+    export interface TxInfo {
+      hash: string;
+      height: bigint;
+    }
+
+    /**
+     * Transaction config.
+     */
+    export interface TxConfig {
+      gasLimit?: bigint; // utia
+      gasPrice?: number;
+    }
+    ";
+
+    #[wasm_bindgen]
+    extern "C" {
+        /// TxInfo exposed to javascript
+        #[wasm_bindgen(typescript_type = "TxInfo")]
+        pub type JsTxInfo;
+
+        /// TxConfig exposed to javascript
+        #[wasm_bindgen(typescript_type = "TxConfig")]
+        pub type JsTxConfig;
+
+        #[wasm_bindgen(method, getter, js_name = gasLimit)]
+        pub fn gas_limit(this: &JsTxConfig) -> Option<u64>;
+
+        #[wasm_bindgen(method, getter, js_name = gasPrice)]
+        pub fn gas_price(this: &JsTxConfig) -> Option<f64>;
+    }
+
+    impl From<TxInfo> for JsTxInfo {
+        fn from(value: TxInfo) -> JsTxInfo {
+            let obj = make_object!(
+                "hash" => value.hash.to_string().into(),
+                "height" => js_sys::BigInt::from(value.height.value())
+            );
+
+            obj.unchecked_into()
+        }
+    }
+
+    impl From<JsTxConfig> for TxConfig {
+        fn from(value: JsTxConfig) -> TxConfig {
+            TxConfig {
+                gas_limit: value.gas_limit(),
+                gas_price: value.gas_price(),
+            }
+        }
+    }
+}
+
 /// Sign `tx_body` and the transaction metadata as the `base_account` using `signer`
-pub fn sign_tx(
+pub async fn sign_tx(
     tx_body: RawTxBody,
     chain_id: Id,
     base_account: &BaseAccount,
     verifying_key: &VerifyingKey,
-    signer: &impl Signer<Signature>,
+    signer: &impl DocSigner,
     gas_limit: u64,
     fee: u64,
-) -> RawTx {
+) -> Result<RawTx> {
     // From https://github.com/celestiaorg/cosmos-sdk/blob/v1.25.0-sdk-v0.46.16/proto/cosmos/tx/signing/v1beta1/signing.proto#L24
     const SIGNING_MODE_INFO: ModeInfo = ModeInfo {
         sum: Sum::Single { mode: 1 },
@@ -517,21 +618,19 @@ pub fn sign_tx(
         fee,
     };
 
-    let bytes_to_sign = SignDoc {
+    let doc = SignDoc {
         body_bytes: tx_body.encode_to_vec(),
         auth_info_bytes: auth_info.clone().encode_vec(),
         chain_id: chain_id.into(),
         account_number: base_account.account_number,
-    }
-    .encode_to_vec();
+    };
+    let signature = signer.try_sign(doc).await?;
 
-    let signature = signer.sign(&bytes_to_sign);
-
-    RawTx {
+    Ok(RawTx {
         auth_info: Some(auth_info.into()),
         body: Some(tx_body),
         signatures: vec![signature.to_bytes().to_vec()],
-    }
+    })
 }
 
 fn estimate_gas(blobs: &[Blob], app_version: AppVersion, gas_multiplier: f64) -> u64 {
@@ -545,15 +644,4 @@ fn estimate_gas(blobs: &[Blob], app_version: AppVersion, gas_multiplier: f64) ->
         + (tx_size_cost_per_byte * BYTES_PER_BLOB_INFO * blobs.len() as u64)
         + PFB_GAS_FIXED_COST;
     (gas as f64 * gas_multiplier) as u64
-}
-
-// Any::from_msg is infallible, but it yet returns result
-fn into_any<M>(msg: M) -> Any
-where
-    M: Name,
-{
-    Any {
-        type_url: M::type_url(),
-        value: msg.encode_to_vec(),
-    }
 }
