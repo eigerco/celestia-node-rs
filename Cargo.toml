@@ -4,12 +4,12 @@ members = ["cli", "grpc", "node", "node-wasm", "node-uniffi", "proto", "rpc", "t
 
 [workspace.dependencies]
 blockstore = "0.7.1"
-lumina-node = { version = "0.8.0", path = "node" }
-lumina-node-wasm = { version = "0.7.0", path = "node-wasm" }
-celestia-proto = { version = "0.6.0", path = "proto" }
-celestia-grpc = { version = "0.1.0", path = "grpc" }
-celestia-rpc = { version = "0.8.0", path = "rpc", default-features = false }
-celestia-types = { version = "0.9.0", path = "types", default-features = false }
+lumina-node = { version = "0.9.0", path = "node" }
+lumina-node-wasm = { version = "0.8.0", path = "node-wasm" }
+celestia-proto = { version = "0.7.0", path = "proto" }
+celestia-grpc = { version = "0.2.0", path = "grpc" }
+celestia-rpc = { version = "0.9.0", path = "rpc", default-features = false }
+celestia-types = { version = "0.10.0", path = "types", default-features = false }
 tendermint = { version = "0.40.0", default-features = false }
 tendermint-proto = "0.40.0"
 

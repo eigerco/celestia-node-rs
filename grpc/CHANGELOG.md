@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/eigerco/lumina/compare/celestia-grpc-v0.1.0...celestia-grpc-v0.2.0) - 2025-01-21
+
+### Added
+
+- *(grpc)* [**breaking**] add wasm support and transaction client (#474)
+
+### Other
+
+- *(ci)* migrate toolchain action, parallelize (#503)
+- *(grpc)* Increase sleep before blob submission validation to reduce test flakyness (#481)
+
 ## [0.1.0](https://github.com/eigerco/lumina/releases/tag/celestia-grpc-v0.1.0) - 2024-12-02
 
 ### Added

@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0](https://github.com/eigerco/lumina/compare/celestia-rpc-v0.8.0...celestia-rpc-v0.9.0) - 2025-01-21
+
+### Added
+
+- *(node-wasm, types)* [**breaking**] Add method to get blobs for wasm (#468)
+- *(types,rpc)* [**breaking**] move TxConfig to celestia-rpc (#485)
+
+### Other
+
+- *(ci)* migrate toolchain action, parallelize (#503)
+
 ## [0.8.0](https://github.com/eigerco/lumina/compare/celestia-rpc-v0.7.1...celestia-rpc-v0.8.0) - 2024-12-02
 
 ### Added
